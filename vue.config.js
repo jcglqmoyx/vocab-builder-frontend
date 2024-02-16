@@ -5,6 +5,6 @@ module.exports = defineConfig({
         port: 3000
     },
     publicPath: process.env.NODE_ENV === 'production'
-        ? '/vocab-builder-frontend'
+        ? '/vocab-builder-frontend/'
         : '/'
 })
