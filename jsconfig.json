@@ -16,7 +16,7 @@
       "scripthost"
     ]
   },
-  "homepage": "https://jcglqmoyx.github.io/vocab-builder/",
+  "homepage": "https://jcglqmoyx.github.io/vocab-builder-frontend/",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
