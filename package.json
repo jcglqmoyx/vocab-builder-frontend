@@ -1,7 +1,7 @@
 {
-  "name": "vocab-builder-vue",
+  "name": "vocab-builder",
   "version": "0.1.0",
-  "homepage": "https://studyxuexi.github.io/vocab-builder/",
+  "homepage": "https://jcglqmoyx.github.io/vocab-builder/",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

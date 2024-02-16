@@ -4,5 +4,5 @@ module.exports = defineConfig({
     devServer: {
         port: 3000
     },
-    publicPath: '/'
+    publicPath: '/vocab-builder-frontend'
 })
