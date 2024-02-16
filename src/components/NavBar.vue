@@ -55,7 +55,7 @@ if (store.state.user.isAuthenticated) {
 
 const handleRecordAudio = () => {
   console.log('handleRecordAudio');
-  window.open('https://studyxuexi.github.io/toefl-speaking-trainer', '_blank');
+  window.open('https://jcglqmoyx.github.io/audio-recorder-vue', '_blank');
 }
 </script>
 
