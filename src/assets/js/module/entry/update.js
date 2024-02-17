@@ -85,4 +85,22 @@ async function updateEntryStudyCount(id) {
     }
 }
 
-export {updateEntry, updateEntryNote, setUnwanted, updateEntryStudyCount};
+async function resetEntryStudyCountToZero(id) {
+    try {
+        const token = localStorage.getItem("token");
+        const serverLink = localStorage.getItem("server_link");
+        const url = serverLink + '/entry/update/reset/' + id;
+        const response = await axios.put(url, null,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+        return response.data
+    } catch (error) {
+        console.error('Error fetching data from backend:', error);
+    }
+}
+
+export {updateEntry, updateEntryNote, setUnwanted, updateEntryStudyCount, resetEntryStudyCountToZero};

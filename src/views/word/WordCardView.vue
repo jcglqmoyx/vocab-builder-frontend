@@ -218,10 +218,12 @@ const markedAsUnwanted = async () => {
   dataLoaded.value = true;
 };
 
-const handleUnfamiliar = () => {
+const handleUnfamiliar = async () => {
   unfamiliarButtonClicked.value = true;
   showNextWordButtonClicked.value = false;
   gotItWrongButtonClicked.value = false;
+  const updateEntryStudyCountResponse = await updateEntryStudyCount(currentWord.id);
+  checkResponse(updateEntryStudyCountResponse);
 };
 
 const handleFamiliar = () => {
