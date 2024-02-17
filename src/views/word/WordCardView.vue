@@ -157,7 +157,10 @@ const handleTakeNotes = () => {
   noteDrawer.value = true;
 }
 
-const handleKeydown = (event) => {
+const status = ref('judge');
+console.log(status.value);
+
+const handleKeydown = async (event) => {
   if (!noteDrawer.value) {
     if ('0123456789'.includes(event.key)) {
       let number = +event.key;
@@ -167,6 +170,36 @@ const handleKeydown = (event) => {
       }
     } else if (event.key === 's' || event.key === 'S') {
       searchDrawer.value = !searchDrawer.value;
+    } else if (event.key === "n" || event.key === "N") {
+      if (status.value !== "then") {
+        return true;
+      }
+      await showNextWord();
+      status.value = "judge";
+    } else if (event.key === "u" || event.key === "U") {
+      if (status.value !== "then") {
+        return true;
+      }
+      await gotItWrong();
+      status.value = "judge";
+    } else if (event.key === "j" || event.key === "J") {
+      if (status.value !== "judge") {
+        return true;
+      }
+      handleFamiliar();
+      status.value = "then";
+    } else if (event.key === "k" || event.key === "K") {
+      if (status.value !== "judge") {
+        return true;
+      }
+      handleUnfamiliar();
+      status.value = "then";
+    } else if (event.key === "d" || event.key === "D") {
+      if (status.value !== "judge") {
+        return true;
+      }
+      await markedAsUnwanted();
+      status.value = "judge";
     } else {
       return true;
     }
