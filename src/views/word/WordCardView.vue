@@ -195,9 +195,6 @@ const handleKeydown = async (event) => {
       handleUnfamiliar();
       status.value = "then";
     } else if (event.key === "d" || event.key === "D") {
-      if (status.value !== "judge") {
-        return true;
-      }
       await markedAsUnwanted();
       status.value = "judge";
     } else {
