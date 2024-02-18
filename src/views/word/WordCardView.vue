@@ -29,9 +29,8 @@
       </div>
 
       <div class="footer">
-        <el-button v-if="status === 1" @click="handleUnfamiliar">不认识
-        </el-button>
         <el-button v-if="status === 1" @click="handleFamiliar">认识</el-button>
+        <el-button v-if="status === 1" @click="handleUnfamiliar">不认识</el-button>
         <el-button v-if="status === 2" @click="gotItWrong">记错了</el-button>
         <el-button v-if="status === 2 || status === 3" @click="showNextWord">下一词</el-button>
       </div>
