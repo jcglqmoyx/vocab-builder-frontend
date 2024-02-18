@@ -1,8 +1,8 @@
 <template>
   <ContentBase @keydown="handleKeydown" tabindex="0">
-    <div v-if="dataLoaded" class="word-card">
+    <div v-if="dataStatus === 1" class="word-card">
       <div class="header">
-        <el-button v-if="showHeader" class="centered-button" circle @click="handleSearch">
+        <el-button v-if="showHeader" class="centered-button" circle @click="showSearchDrawer = !showSearchDrawer">
           <el-icon>
             <el-icon>
               <Search/>
@@ -10,7 +10,7 @@
           </el-icon>
         </el-button>
         &nbsp;
-        <el-button v-if="showHeader" class="centered-button" circle @click="handleTakeNotes">
+        <el-button v-if="showHeader" class="centered-button" circle @click="showEditNoteDrawer = !showEditNoteDrawer">
           <el-icon>
             <EditPen/>
           </el-icon>
@@ -23,33 +23,38 @@
         </el-button>
       </div>
 
-      <div class="card-body">
-        <div class="word">{{ currentWord.word }}</div>
-        <div v-if="familiarButtonClicked || unfamiliarButtonClicked" class="word">{{ currentWord.meaning }}</div>
+      <div>
+        <div class="word">{{ words[idx].word }}</div>
+        <div v-if="status === 2 || status === 3" class="word">{{ words[idx].meaning }}</div>
       </div>
 
-      <div v-if="wordArray.length !== 0" class="footer">
-        <el-button v-if="showNextWordButtonClicked || gotItWrongButtonClicked" @click="handleUnfamiliar">不认识
+      <div class="footer">
+        <el-button v-if="status === 1" @click="handleUnfamiliar">不认识
         </el-button>
-        <el-button v-if="showNextWordButtonClicked || gotItWrongButtonClicked" @click="handleFamiliar">认识</el-button>
-        <el-button v-if="familiarButtonClicked" @click="gotItWrong">记错了</el-button>
-        <el-button v-if="familiarButtonClicked || unfamiliarButtonClicked" @click="showNextWord">下一词</el-button>
+        <el-button v-if="status === 1" @click="handleFamiliar">认识</el-button>
+        <el-button v-if="status === 2" @click="gotItWrong">记错了</el-button>
+        <el-button v-if="status === 2 || status === 3" @click="showNextWord">下一词</el-button>
       </div>
     </div>
-    <div v-else>
-      <h1>Loading data...</h1>
+    <div v-else-if="dataStatus === 2" class="word-card">
+      <h1 class="word">Loading data...</h1>
+    </div>
+    <div v-else-if="dataStatus === 3" class="word-card">
+      <h1 class="word">当前任务已完成</h1>
     </div>
 
-    <el-drawer v-model="searchDrawer" title="搜索" :with-header="true">
-      <p v-for="(dict, index) in dictionaries" :key="dict.id">
-        <a :href="dict.prefix + currentWord.word + (dict.suffix || '') " target="_blank">
-          <b>{{ index + 1 }}. {{ dict.title }}</b>
+    <!-- Search Drawer 必须置于ContentBase中，如果不放在ContentBase中，则按下s键（搜索单词）后，ContentBase将失去焦点，再次按快捷键将无效 -->
+    <el-drawer v-model="showSearchDrawer" title="搜索" :with-header="true">
+      <p v-for="(dictionary, index) in dictionaries" :key="dictionary.id">
+        <a :href="dictionary.prefix + words[idx].word + (dictionary.suffix || '') " target="_blank">
+          <b>{{ index + 1 }}. {{ dictionary.title }}</b>
         </a>
         <el-divider/>
       </p>
     </el-drawer>
   </ContentBase>
-  <el-drawer v-model="noteDrawer" title="笔记" :with-header="true">
+
+  <el-drawer v-model="showEditNoteDrawer" title="笔记" :with-header="true">
     <el-input
         type="textarea"
         placeholder="添加备注"
@@ -74,55 +79,42 @@ import {defineProps, onMounted, reactive, ref} from "vue";
 import {getUserProfile} from "@/assets/js/module/user/query";
 import {getDictionaryList} from "@/assets/js/module/dictionary/query";
 import {fetchWords} from "@/assets/js/module/entry/query";
-import {setUnwanted, updateEntryNote, updateEntryStudyCount} from "@/assets/js/module/entry/update";
-
-const store = useStore();
-const currentWordId = ref(0);
-const currentWordNote = ref('');
+import {
+  resetEntryStudyCountToZero,
+  setUnwanted,
+  updateEntryNote,
+  updateEntryStudyCount
+} from "@/assets/js/module/entry/update";
 
 const props = defineProps(["type"]);
-const dataLoaded = ref(false);
-let countRecognizedTime = {};
-let idx = 0;
-let wordArray = [];
+/*
+ * 1: 加载成功
+ * 2: 加载中
+ * 3: 学习或复习任务已完成
+ */
+const dataStatus = ref(2);
+
+const showHeader = ref(true);
+const showSearchDrawer = ref(false);
+const showEditNoteDrawer = ref(false);
 
 let dictionaries = reactive([]);
 
-const timesCountedAsKnown = ref(0);
-const showHeader = ref(true);
-
-const familiarButtonClicked = ref(false);
-const unfamiliarButtonClicked = ref(false);
-const showNextWordButtonClicked = ref(true);
-const gotItWrongButtonClicked = ref(true);
-
-const searchDrawer = ref(false);
-const noteDrawer = ref(false);
-const status = ref('judge');
-
 let words = reactive([]);
+let idx = ref(0);
+let countRecognitionTime = {};
+const timesCountedAsKnown = ref(0);
 
-let currentWord = reactive(
-    {
-      id: 0,
-      word: "",
-      meaning: "",
-      book_id: 0,
-      user_id: 0,
-      note: "",
-      study_count: 0,
-    }
-);
-
-function init(words) {
-  words.forEach(word => {
-    countRecognizedTime[word['id']] = 0;
-    wordArray.push(word);
-  });
-}
+/*
+ * 1: 刚开始的页面
+ * 2: 选择了认识
+ * 3: 选择了不认识
+ */
+const status = ref(1);
 
 const checkResponse = (response) => {
   if (response == null || response.code === 2) {
+    const store = useStore();
     store.dispatch("logout")
     location.reload();
   }
@@ -134,16 +126,13 @@ onMounted(
       checkResponse(fetchWordsResponse)
       words = fetchWordsResponse.data;
       if (words == null || words.length === 0) {
-        currentWord.word = "当前任务已完成";
-        currentWord.meaning = "";
-        dataLoaded.value = true;
-        showHeader.value = false;
+        dataStatus.value = 3;
+        return;
       } else {
-        dataLoaded.value = true;
-        currentWord = words[idx];
-        currentWordNote.value = currentWord.note;
-        currentWordId.value = currentWord.id;
-        init(words);
+        dataStatus.value = 1;
+        for (let i = 0; i < words.length; i++) {
+          countRecognitionTime[i] = 0;
+        }
       }
 
       const getDictionaryListResponse = await getDictionaryList();
@@ -156,115 +145,89 @@ onMounted(
     }
 );
 
-
-const handleSearch = () => {
-  searchDrawer.value = true;
-};
-const handleTakeNotes = () => {
-  noteDrawer.value = true;
-}
-
-
 const handleKeydown = async (event) => {
-  if (!noteDrawer.value) {
+  if (!showEditNoteDrawer.value) {
     if ('0123456789'.includes(event.key)) {
       let number = +event.key;
       if (number === 0) number = 10;
       if (number <= dictionaries.length) {
-        window.open(dictionaries[number - 1].prefix + currentWord.word + (dictionaries[number - 1].suffix || ""), '_blank');
+        window.open(dictionaries[number - 1].prefix + words[idx.value].word + (dictionaries[number - 1].suffix || ""), '_blank');
       }
-    } else if (event.key === 's' || event.key === 'S') {
-      searchDrawer.value = !searchDrawer.value;
-    } else if (event.key === "n" || event.key === "N") {
-      if (status.value !== "then") {
+    } else if (event.key === 's') {
+      showSearchDrawer.value = !showSearchDrawer.value;
+      console.log(showSearchDrawer.value);
+    } else if (event.key === "n") {
+      if (status.value !== 2 && status.value !== 3) {
         return true;
       }
       await showNextWord();
-      status.value = "judge";
-    } else if (event.key === "u" || event.key === "U") {
-      if (status.value !== "then") {
+    } else if (event.key === "u") {
+      if (status.value !== 3) {
         return true;
       }
       await gotItWrong();
-      status.value = "judge";
-    } else if (event.key === "j" || event.key === "J") {
-      if (status.value !== "judge") {
+    } else if (event.key === "j") {
+      if (status.value !== 1) {
         return true;
       }
-      handleFamiliar();
-      status.value = "then";
-    } else if (event.key === "k" || event.key === "K") {
-      if (status.value !== "judge") {
+      await handleFamiliar();
+    } else if (event.key === "k") {
+      if (status.value !== 1) {
         return true;
       }
       await handleUnfamiliar();
-      status.value = "then";
     } else if (event.key === "d" || event.key === "D") {
       await markedAsUnwanted();
-      status.value = "judge";
     } else {
       return true;
     }
   }
 };
+
 const markedAsUnwanted = async () => {
-  const markedAsUnwantedResponse = await setUnwanted(currentWord.id);
+  const markedAsUnwantedResponse = await setUnwanted(words[idx.value].id);
   checkResponse(markedAsUnwantedResponse);
-  wordArray.splice(idx, 1);
-  dataLoaded.value = false;
-  if (wordArray.length === 0) {
-    currentWord.word = "当前任务已完成";
-    currentWord.meaning = null;
-    showHeader.value = false;
-  } else {
-    idx = (idx + 1) % wordArray.length;
-    currentWord = wordArray[idx];
-  }
-  dataLoaded.value = true;
+  await showNextWord();
 };
 
 const handleUnfamiliar = async () => {
-  unfamiliarButtonClicked.value = true;
-  showNextWordButtonClicked.value = false;
-  gotItWrongButtonClicked.value = false;
-  const updateEntryStudyCountResponse = await updateEntryStudyCount(currentWord.id);
-  checkResponse(updateEntryStudyCountResponse);
+  countRecognitionTime[idx.value] = 0;
+  const resetEntryStudyCountToZeroResponse = await resetEntryStudyCountToZero(words[idx.value].id);
+  checkResponse(resetEntryStudyCountToZeroResponse);
+  status.value = 3;
 };
 
-const handleFamiliar = () => {
-  familiarButtonClicked.value = true;
-  showNextWordButtonClicked.value = false;
-  gotItWrongButtonClicked.value = false;
-  countRecognizedTime[currentWord.id]++;
-};
-const gotItWrong = () => {
-  gotItWrongButtonClicked.value = true;
-  familiarButtonClicked.value = false;
-  countRecognizedTime[currentWord.id]--;
-  idx = (idx + 1) % wordArray.length;
-  currentWord = wordArray[idx];
-}
-const showNextWord = async () => {
-  showNextWordButtonClicked.value = true;
-  familiarButtonClicked.value = false;
-  unfamiliarButtonClicked.value = false;
-  if (countRecognizedTime[currentWord.id] >= timesCountedAsKnown.value) {
-    const updateEntryStudyCountResponse = await updateEntryStudyCount(currentWord.id);
+const handleFamiliar = async () => {
+  countRecognitionTime[idx.value]++;
+  if (countRecognitionTime[idx.value] >= timesCountedAsKnown.value) {
+    const updateEntryStudyCountResponse = await updateEntryStudyCount(words[idx.value].id);
     checkResponse(updateEntryStudyCountResponse);
-    wordArray.splice(idx, 1);
-    if (wordArray.length === 0) {
-      currentWord.word = "当前任务已完成";
-      currentWord.meaning = null;
-      showHeader.value = false;
-      return;
-    }
   }
-  idx = (idx + 1) % wordArray.length;
-  currentWord = wordArray[idx];
+  status.value = 2;
+};
+
+const gotItWrong = async () => {
+  countRecognitionTime[idx.value] = 0;
+  const resetEntryStudyCountToZeroResponse = await resetEntryStudyCountToZero(words[idx.value].id);
+  checkResponse(resetEntryStudyCountToZeroResponse);
+  await showNextWord();
+}
+
+const showNextWord = async () => {
+  let tempIdx = idx.value;
+  do {
+    tempIdx = (tempIdx + 1) % words.length;
+  } while (tempIdx !== idx.value && countRecognitionTime[tempIdx] >= timesCountedAsKnown.value);
+  if (tempIdx === idx.value && countRecognitionTime[tempIdx] >= timesCountedAsKnown.value) {
+    dataStatus.value = 3;
+  } else {
+    status.value = 1;
+    idx.value = tempIdx;
+  }
 }
 
 const updateNote = async () => {
-  const updateNoteResponse = await updateEntryNote(currentWordId.value, currentWordNote.value);
+  const updateNoteResponse = await updateEntryNote(words[idx.value].id, words[idx.value].note);
   checkResponse(updateNoteResponse);
 }
 </script>

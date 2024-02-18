@@ -51,11 +51,8 @@ async function setUnwanted(id) {
     try {
         const token = localStorage.getItem("token");
         const serverLink = localStorage.getItem("server_link");
-        const url = serverLink + '/entry/update'
-        const response = await axios.put(url, {
-            id,
-            unwanted: true,
-        }, {
+        const url = serverLink + '/entry/update/unwanted/' + id;
+        const response = await axios.put(url, null, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
