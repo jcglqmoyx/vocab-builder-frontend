@@ -23,7 +23,7 @@
         </el-button>
       </div>
 
-      <div>
+      <div class="card-body">
         <div class="word">{{ currentWord.word }}</div>
         <div v-if="familiarButtonClicked || unfamiliarButtonClicked" class="word">{{ currentWord.meaning }}</div>
       </div>
@@ -66,20 +66,42 @@
 <script setup>
 import {ElButton, ElDivider, ElDrawer, ElIcon, ElInput} from 'element-plus';
 import {Delete, EditPen, Search} from "@element-plus/icons-vue";
-import {defineProps, onMounted, reactive, ref} from "vue";
-import {fetchWords} from "@/assets/js/module/entry/query";
 import ContentBase from "@/components/ContentBase.vue";
-import {useStore} from "vuex";
-import {getDictionaryList} from "@/assets/js/module/dictionary/query";
-import {setUnwanted, updateEntryNote, updateEntryStudyCount} from "@/assets/js/module/entry/update";
-import {getUserProfile} from "@/assets/js/module/user/query";
 
+import {useStore} from "vuex";
+import {defineProps, onMounted, reactive, ref} from "vue";
+
+import {getUserProfile} from "@/assets/js/module/user/query";
+import {getDictionaryList} from "@/assets/js/module/dictionary/query";
+import {fetchWords} from "@/assets/js/module/entry/query";
+import {setUnwanted, updateEntryNote, updateEntryStudyCount} from "@/assets/js/module/entry/update";
+
+const store = useStore();
 const currentWordId = ref(0);
 const currentWordNote = ref('');
 
 const props = defineProps(["type"]);
 const dataLoaded = ref(false);
+let countRecognizedTime = {};
+let idx = 0;
+let wordArray = [];
+
+let dictionaries = reactive([]);
+
+const timesCountedAsKnown = ref(0);
+const showHeader = ref(true);
+
+const familiarButtonClicked = ref(false);
+const unfamiliarButtonClicked = ref(false);
+const showNextWordButtonClicked = ref(true);
+const gotItWrongButtonClicked = ref(true);
+
+const searchDrawer = ref(false);
+const noteDrawer = ref(false);
+const status = ref('judge');
+
 let words = reactive([]);
+
 let currentWord = reactive(
     {
       id: 0,
@@ -91,16 +113,6 @@ let currentWord = reactive(
       study_count: 0,
     }
 );
-const familiarButtonClicked = ref(false);
-const unfamiliarButtonClicked = ref(false);
-const showNextWordButtonClicked = ref(true);
-const gotItWrongButtonClicked = ref(true);
-
-let countRecognizedTime = {};
-let idx = 0;
-let wordArray = [];
-
-let dictionaries = reactive([]);
 
 function init(words) {
   words.forEach(word => {
@@ -109,7 +121,6 @@ function init(words) {
   });
 }
 
-const store = useStore();
 const checkResponse = (response) => {
   if (response == null || response.code === 2) {
     store.dispatch("logout")
@@ -117,8 +128,6 @@ const checkResponse = (response) => {
   }
 }
 
-const timesCountedAsKnown = ref(0);
-const showHeader = ref(true);
 onMounted(
     async () => {
       const fetchWordsResponse = await fetchWords(props.type);
@@ -148,8 +157,6 @@ onMounted(
 );
 
 
-const searchDrawer = ref(false);
-const noteDrawer = ref(false);
 const handleSearch = () => {
   searchDrawer.value = true;
 };
@@ -157,8 +164,6 @@ const handleTakeNotes = () => {
   noteDrawer.value = true;
 }
 
-const status = ref('judge');
-console.log(status.value);
 
 const handleKeydown = async (event) => {
   if (!noteDrawer.value) {
