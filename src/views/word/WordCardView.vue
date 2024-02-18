@@ -16,7 +16,7 @@
           </el-icon>
         </el-button>
         &nbsp;
-        <el-button v-if="showHeader" class="centered-button" circle @click="markedAsUnwanted">
+        <el-button v-if="showHeader" class="centered-button" circle @click="markAsUnwanted">
           <el-icon>
             <Delete/>
           </el-icon>
@@ -177,14 +177,15 @@ const handleKeydown = async (event) => {
       }
       await handleUnfamiliar();
     } else if (event.key === "d" || event.key === "D") {
-      await markedAsUnwanted();
+      await markAsUnwanted();
     } else {
       return true;
     }
   }
 };
 
-const markedAsUnwanted = async () => {
+const markAsUnwanted = async () => {
+  countRecognitionTime[idx.value] = timesCountedAsKnown.value;
   const markedAsUnwantedResponse = await setUnwanted(words[idx.value].id);
   checkResponse(markedAsUnwantedResponse);
   await showNextWord();
