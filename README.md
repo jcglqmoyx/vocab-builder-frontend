@@ -1,24 +1,21 @@
-# frontend
+## Nginx 配置
+```nginx
+server {
+    listen 8085;
+    listen [::]:8085;
 
-## Project setup
-```
-npm install
-```
+    server_name 124.222.147.251;
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+    root /var/www/html/dist;
 
-### Compiles and minifies for production
-```
-npm run build
-```
+    index index.html;
 
-### Lints and fixes files
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires max;
+        log_not_found off;
+    }
+}
 ```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
