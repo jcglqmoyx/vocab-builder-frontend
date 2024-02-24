@@ -32,9 +32,9 @@
       </el-menu-item>
     </el-sub-menu>
 
-    <router-link :to=" {name: 'help'} ">
-      <el-menu-item index="3">帮助</el-menu-item>
-    </router-link>
+    <el-menu-item index="4" @click="handleOpenHelpPage">
+      帮助
+    </el-menu-item>
 
     <LoginAndLogoutMenuItem/>
   </el-menu>
@@ -54,7 +54,11 @@ if (store.state.user.isAuthenticated) {
 }
 
 const handleRecordAudio = () => {
-  window.open('https://jcglqmoyx.github.io/audio-recorder', '_blank');
+  window.open('https://jcglqmoyx.gitee.io/audio-recorder', '_blank');
+}
+
+const handleOpenHelpPage = () => {
+  window.open('https://jcglqmoyx.gitee.io/vocab-builder-helper', '_blank');
 }
 </script>
 

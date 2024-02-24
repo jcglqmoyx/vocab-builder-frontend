@@ -56,7 +56,7 @@
   <el-drawer v-model="showEditNoteDrawer" title="笔记" :with-header="true">
     <el-input
         type="textarea"
-        placeholder="添加备注"
+        placeholder="添加笔记"
         v-model="currentWordNote"
         :rows="30"
         maxlength="1000"

@@ -1,8 +1,13 @@
+// 用Gitee Pages代替了，所以这个页面暂时不用了, 没有删除是因为有可能以后会用到
 <template>
   <div class="software-guide">
-    <h1>使用指南</h1>
+    <h2>使用指南</h2>
     <section>
-      <p>在电脑浏览器里打开，背单词时如果想使用词典查找该单词，可以点击一下 放大镜 按钮，然后用鼠标点击对应的词典，或者按下词典对应的数字快捷键</p>
+      <ol>
+        <li>
+          背单词时如果想使用词典查找该单词，可以点击一下放大镜按钮(快捷键: s)，然后用鼠标点击对应的词典(快捷键: 词典对应的数字编号)。
+        </li>
+      </ol>
     </section>
   </div>
 </template>
@@ -18,16 +23,13 @@
   padding: 20px;
 }
 
-h1 {
+h2 {
   text-align: center;
+  color: #333;
 }
 
 section {
   margin-top: 20px;
-}
-
-h2 {
-  color: #333;
 }
 
 p {

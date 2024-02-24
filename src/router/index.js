@@ -2,7 +2,6 @@ import {createRouter, createWebHistory} from 'vue-router'
 import wordRoutes from "@/router/word";
 import authRoutes from "@/router/auth";
 import SettingRoutes from "@/router/setting";
-import helpRoutes from "@/router/help";
 
 const routes = [
     {
@@ -28,7 +27,6 @@ const router = createRouter({
         ...wordRoutes,
         ...authRoutes,
         ...SettingRoutes,
-        ...helpRoutes,
         ...routes,
     ]
 })
