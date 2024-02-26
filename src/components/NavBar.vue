@@ -58,7 +58,7 @@ const handleRecordAudio = () => {
 }
 
 const handleOpenHelpPage = () => {
-  window.open('https://jcglqmoyx.gitee.io/vocab-builder-helper', '_blank');
+  window.open('https://jcglqmoyx.gitee.io/vocab-builder-helper/posts/vocab-builder-helper/', '_blank');
 }
 </script>
 
