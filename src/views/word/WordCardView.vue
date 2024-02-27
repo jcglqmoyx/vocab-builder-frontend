@@ -161,7 +161,7 @@ const handleKeydown = async (event) => {
       }
       await showNextWord();
     } else if (event.key === "u") {
-      if (status.value !== 3) {
+      if (status.value !== 2) {
         return true;
       }
       await gotItWrong();
