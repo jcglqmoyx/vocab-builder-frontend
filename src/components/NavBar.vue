@@ -54,7 +54,7 @@ if (store.state.user.isAuthenticated) {
 }
 
 const handleRecordAudio = () => {
-  window.open('https://jcglqmoyx.gitee.io/audio-recorder', '_blank');
+  window.open('https://jcglqmoyx.github.io/audio-recorder', '_blank');
 }
 
 const handleOpenHelpPage = () => {
