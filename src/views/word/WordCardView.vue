@@ -124,7 +124,6 @@ onMounted(
       const fetchWordsResponse = await fetchWords(props.type);
       checkResponse(fetchWordsResponse)
       words = fetchWordsResponse.data;
-      console.log(words);
       if (words == null || words.length === 0) {
         dataStatus.value = 3;
         return;
