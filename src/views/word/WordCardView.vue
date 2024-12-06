@@ -81,7 +81,7 @@ import {fetchWords} from "@/assets/js/module/entry/query";
 import {
   resetEntryStudyCountToZero,
   setUnwanted,
-  updateEntryNote,
+  updateEntry,
   updateEntryStudyCount
 } from "@/assets/js/module/entry/update";
 
@@ -124,6 +124,7 @@ onMounted(
       const fetchWordsResponse = await fetchWords(props.type);
       checkResponse(fetchWordsResponse)
       words = fetchWordsResponse.data;
+      console.log(words);
       if (words == null || words.length === 0) {
         dataStatus.value = 3;
         return;
@@ -154,7 +155,6 @@ const handleKeydown = async (event) => {
       }
     } else if (event.key === 's') {
       showSearchDrawer.value = !showSearchDrawer.value;
-      console.log(showSearchDrawer.value);
     } else if (event.key === "n") {
       if (status.value !== 2 && status.value !== 3) {
         return true;
@@ -226,8 +226,9 @@ const showNextWord = async () => {
   }
 }
 
+let currentWordNote = ref('');
 const updateNote = async () => {
-  const updateNoteResponse = await updateEntryNote(words[idx.value].id, words[idx.value].note);
+  const updateNoteResponse = await updateEntry(words[idx.value].id, words[idx.value].word, words[idx.value].meaning, words[idx.value].book_id, currentWordNote.value, words[idx.value].date_to_review, words[idx.value].created_at);
   checkResponse(updateNoteResponse);
 }
 </script>

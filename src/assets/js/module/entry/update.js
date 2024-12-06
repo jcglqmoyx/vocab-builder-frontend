@@ -27,26 +27,6 @@ async function updateEntry(id, word, meaning, book_id, note, unwanted, study_cou
     }
 }
 
-async function updateEntryNote(id, note) {
-    try {
-        const token = localStorage.getItem("token");
-        const serverLink = localStorage.getItem("server_link");
-        const url = serverLink + '/entry/update'
-        const response = await axios.put(url, {
-            id,
-            note,
-        }, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
-        return response.data
-    } catch (error) {
-        console.error('Error fetching data from backend:', error);
-    }
-}
-
 async function setUnwanted(id) {
     try {
         const token = localStorage.getItem("token");
@@ -100,4 +80,4 @@ async function resetEntryStudyCountToZero(id) {
     }
 }
 
-export {updateEntry, updateEntryNote, setUnwanted, updateEntryStudyCount, resetEntryStudyCountToZero};
+export {updateEntry, setUnwanted, updateEntryStudyCount, resetEntryStudyCountToZero};
