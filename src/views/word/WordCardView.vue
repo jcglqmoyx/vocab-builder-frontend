@@ -10,7 +10,7 @@
           </el-icon>
         </el-button>
         &nbsp;
-        <el-button v-if="showHeader" class="centered-button" circle @click="showEditNoteDrawer = !showEditNoteDrawer">
+        <el-button v-if="showHeader" class="centered-button" circle @click="showEditNoteDrawerButtonClicked">
           <el-icon>
             <EditPen/>
           </el-icon>
@@ -96,6 +96,10 @@ const dataStatus = ref(2);
 const showHeader = ref(true);
 const showSearchDrawer = ref(false);
 const showEditNoteDrawer = ref(false);
+const showEditNoteDrawerButtonClicked = () => {
+  setCurrentWordNote();
+  showEditNoteDrawer.value = !showEditNoteDrawer.value;
+}
 
 let dictionaries = reactive([]);
 
@@ -226,8 +230,12 @@ const showNextWord = async () => {
 }
 
 let currentWordNote = ref('');
+const setCurrentWordNote = () => {
+  currentWordNote.value = words[idx.value].note;
+};
+
 const updateNote = async () => {
-  const updateNoteResponse = await updateEntry(words[idx.value].id, words[idx.value].word, words[idx.value].meaning, words[idx.value].book_id, currentWordNote.value, words[idx.value].date_to_review, words[idx.value].created_at);
+  const updateNoteResponse = await updateEntry(words[idx.value].id, words[idx.value].word, words[idx.value].meaning, words[idx.value].book_id, currentWordNote.value, words[idx.value].unwanted, words[idx.value].study_count, words[idx.value].date_to_review, words[idx.value].created_at);
   checkResponse(updateNoteResponse);
 }
 </script>

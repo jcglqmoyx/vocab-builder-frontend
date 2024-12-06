@@ -5,6 +5,14 @@ async function updateEntry(id, word, meaning, book_id, note, unwanted, study_cou
         const token = localStorage.getItem("token");
         const serverLink = localStorage.getItem("server_link");
         const url = serverLink + '/entry/update'
+        console.log(id,
+            word,
+            meaning,
+            book_id,
+            note,
+            date_to_review,
+            created_at,)
+        ;
         const response = await axios.put(url, {
             id,
             word,
