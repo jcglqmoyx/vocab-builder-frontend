@@ -1,10 +1,10 @@
 ## Nginx 配置
 ```nginx
 server {
-    listen 8085;
-    listen [::]:8085;
+    listen 8080;
+    listen [::]:8080;
 
-    server_name 124.222.147.251;
+    server_name xxx.xxx.xxx.xxx;
 
     root /var/www/html/dist;
 
